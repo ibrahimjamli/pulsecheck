@@ -5,7 +5,7 @@
 # Compilers and headers live only here, so none of them reach the runtime
 # image. Wheels are cached across builds via BuildKit's cache mount.
 # ---------------------------------------------------------------------------
-FROM python:3.12-slim-bookworm AS builder
+FROM python:3.14-slim-bookworm AS builder
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=0 \
@@ -39,7 +39,7 @@ RUN pip uninstall --yes setuptools wheel && \
 # ---------------------------------------------------------------------------
 # Stage 2: runtime. Slim base, no build tooling, unprivileged user.
 # ---------------------------------------------------------------------------
-FROM python:3.12-slim-bookworm AS runtime
+FROM python:3.14-slim-bookworm AS runtime
 
 # OCI labels let `docker inspect` and registry UIs trace an image back to the
 # exact commit that produced it.
