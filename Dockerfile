@@ -56,7 +56,12 @@ LABEL org.opencontainers.image.title="pulsecheck" \
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/opt/venv/bin:$PATH"
+    PATH="/opt/venv/bin:$PATH" \
+    # The application's own default writes ./pulsecheck.db, which an
+    # unprivileged user cannot create in a root-owned WORKDIR. Point it at the
+    # one directory the image grants that user, which is also where Kubernetes
+    # mounts its emptyDir under a read-only root filesystem.
+    PULSECHECK_DATABASE_URL="sqlite+aiosqlite:////data/pulsecheck.db"
 
 # curl is needed by the HEALTHCHECK below; the rest of the apt cache is dropped
 # in the same layer so it never lands in the image.
@@ -64,7 +69,8 @@ RUN apt-get update && \
     apt-get install --no-install-recommends -y curl && \
     rm -rf /var/lib/apt/lists/* && \
     groupadd --system --gid 10001 app && \
-    useradd --system --uid 10001 --gid app --no-create-home app
+    useradd --system --uid 10001 --gid app --no-create-home app && \
+    mkdir -p /data && chown 10001:10001 /data
 
 COPY --from=builder /opt/venv /opt/venv
 WORKDIR /app

@@ -50,6 +50,13 @@ service imports. Deleting it removed the finding at the root instead of adding
 a suppression, and it removes the ability to install anything into a running
 container as a side effect.
 
+**The image writes to exactly one directory.** `/data` is the only path the
+unprivileged user owns, and the image points the database there by default.
+The container smoke test found this: running as UID 10001, the application
+could not create its SQLite file in a root-owned working directory, so the
+container exited on startup. Kubernetes mounts an `emptyDir` at the same path,
+so the two environments agree.
+
 **Runs as UID 10001 with a read-only root filesystem.** The container drops
 all capabilities and forbids privilege escalation. Anything that needs to
 write gets an explicit `emptyDir`. CI asserts the running UID rather than
