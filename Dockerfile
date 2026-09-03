@@ -25,6 +25,17 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip setuptools wheel && \
     pip install ".[postgres]"
 
+# Strip the packaging toolchain out of the virtualenv before it is copied into
+# the runtime image. Nothing needs pip or setuptools to *run* the application,
+# and both keep appearing in vulnerability scans in their own right: pip
+# vendors msgpack, and setuptools has its own history of path-traversal
+# advisories. Removing them takes the whole class of finding out of the shipped
+# image rather than suppressing it.
+RUN pip uninstall --yes setuptools wheel && \
+    rm -rf /opt/venv/lib/python*/site-packages/pip \
+           /opt/venv/lib/python*/site-packages/pip-*.dist-info \
+           /opt/venv/bin/pip*
+
 # ---------------------------------------------------------------------------
 # Stage 2: runtime. Slim base, no build tooling, unprivileged user.
 # ---------------------------------------------------------------------------

@@ -42,6 +42,14 @@ The runtime image carries a virtualenv and the application, nothing else.
 Dependencies are installed before the application is copied, so editing a
 source file does not invalidate the dependency layer.
 
+**No package manager in the runtime image.** The build stage installs
+dependencies into a virtualenv and then deletes pip, setuptools and wheel
+before that virtualenv is copied across. The first scan of this image failed on
+two HIGH advisories, both of them in that tooling rather than in anything the
+service imports. Deleting it removed the finding at the root instead of adding
+a suppression, and it removes the ability to install anything into a running
+container as a side effect.
+
 **Runs as UID 10001 with a read-only root filesystem.** The container drops
 all capabilities and forbids privilege escalation. Anything that needs to
 write gets an explicit `emptyDir`. CI asserts the running UID rather than
