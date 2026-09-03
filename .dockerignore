@@ -1,0 +1,17 @@
+.git
+.github
+.venv
+.pytest_cache
+.mypy_cache
+.ruff_cache
+__pycache__
+*.pyc
+*.db
+.coverage
+coverage.xml
+deploy
+docs
+tests
+terraform
+*.md
+!README.md
