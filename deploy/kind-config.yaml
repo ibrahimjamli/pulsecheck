@@ -1,0 +1,10 @@
+# Single control-plane cluster with host ports mapped, so the NodePort service
+# is reachable from the CI runner without an ingress controller.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 30080
+        protocol: TCP

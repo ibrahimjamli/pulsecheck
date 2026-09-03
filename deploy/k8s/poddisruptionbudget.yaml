@@ -1,0 +1,11 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pulsecheck
+  namespace: pulsecheck
+spec:
+  # Keeps one pod serving while a node is drained for maintenance.
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: pulsecheck

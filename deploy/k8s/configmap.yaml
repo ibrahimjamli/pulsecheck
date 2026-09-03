@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pulsecheck-config
+  namespace: pulsecheck
+data:
+  # SQLite on an emptyDir keeps the smoke test to a single object. A real
+  # deployment would point this at a managed Postgres and take the URL from a
+  # Secret rather than a ConfigMap.
+  PULSECHECK_DATABASE_URL: "sqlite+aiosqlite:////data/pulsecheck.db"
+  PULSECHECK_ENVIRONMENT: "kubernetes"
+  PULSECHECK_LOG_LEVEL: "INFO"
