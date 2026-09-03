@@ -58,6 +58,14 @@ worse.
 than claiming it: it restarts the deployment while polling the endpoint twice a
 second and fails if a single request is dropped.
 
+That check earned its place on the first run, which dropped three requests. A
+pod is removed from the Service endpoints and sent `SIGTERM` at the same
+moment, but kube-proxy needs a moment to rewrite the node's iptables rules, so
+traffic keeps arriving at a container that is already shutting down. The fix is
+a `preStop` sleep that holds the container open through that window. Without
+the test the deployment would have looked correct and quietly dropped requests
+on every release.
+
 **Metrics are labelled by route template.** `/api/v1/monitors/{monitor_id}`,
 not `/api/v1/monitors/17`. Labelling by raw path would create one time series
 per monitor id and eventually take down the Prometheus server. There is a test

@@ -94,6 +94,10 @@ jobs:
       - name: Publish scan results to the Security tab
         uses: github/codeql-action/upload-sarif@v3
         if: always()
+        # Code scanning uploads require a public repository or GitHub Advanced
+        # Security. The scan itself still gates the build in the next step, so
+        # a private clone should not go red over the upload alone.
+        continue-on-error: true
         with:
           sarif_file: trivy.sarif
           category: trivy-image

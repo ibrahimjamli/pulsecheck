@@ -24,6 +24,8 @@ spec:
         prometheus.io/port: "8000"
         prometheus.io/path: "/metrics"
     spec:
+      # Long enough for the preStop sleep plus a slow in-flight request.
+      terminationGracePeriodSeconds: 30
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
@@ -64,6 +66,15 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
+          # Endpoint removal and SIGTERM happen together, but kube-proxy takes a
+          # moment to rewrite the node's iptables rules. Without this pause the
+          # rollout drops the requests still being routed to a terminating pod.
+          # The CI job restarts the deployment under load and fails on a single
+          # dropped request, which is how this was found.
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "10"]
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
