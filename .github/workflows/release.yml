@@ -28,7 +28,7 @@ jobs:
       id-token: write     # keyless signing via Sigstore
       attestations: write # provenance attestation
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0  # full history so the changelog can be generated
 
