@@ -83,7 +83,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: pulsecheck:ci
           format: sarif
@@ -99,7 +99,7 @@ jobs:
           category: trivy-image
 
       - name: Fail the build on a fixable HIGH or CRITICAL CVE
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: pulsecheck:ci
           format: table
@@ -157,8 +157,10 @@ jobs:
       - name: Load the image into the cluster
         run: kind load docker-image pulsecheck:dev --name pulsecheck
 
-      - name: Validate the manifests before applying
-        run: kubectl apply -k deploy/k8s --dry-run=server
+      - name: Validate the rendered manifests
+        # Client-side, because a server-side dry run cannot create objects in a
+        # namespace that does not exist yet and so fails on a first deploy.
+        run: kubectl kustomize deploy/k8s | kubectl apply --dry-run=client -f -
 
       - name: Apply
         run: kubectl apply -k deploy/k8s

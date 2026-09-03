@@ -7,5 +7,10 @@ resources:
   - deployment.yaml
   - service.yaml
   - poddisruptionbudget.yaml
-commonLabels:
-  app.kubernetes.io/part-of: pulsecheck
+# `labels` rather than the deprecated `commonLabels`: includeSelectors stays
+# false so these never leak into the Deployment selector, which is immutable
+# once created.
+labels:
+  - includeSelectors: false
+    pairs:
+      app.kubernetes.io/part-of: pulsecheck
