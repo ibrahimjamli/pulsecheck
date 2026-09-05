@@ -92,7 +92,7 @@ jobs:
           ignore-unfixed: true
 
       - name: Publish scan results to the Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         # Code scanning uploads require a public repository or GitHub Advanced
         # Security. The scan itself still gates the build in the next step, so
